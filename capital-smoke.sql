@@ -1,0 +1,7 @@
+-- Manual smoke checklist after running the migration (execute as an authenticated test user):
+-- 1. Select public.create_business('Test Wakala', 'Tawi la Kwanza') via RPC.
+-- 2. Add an M-Pesa account with create_branch_account before opening the business day.
+-- 3. Open with cash + M-Pesa balances; confirm dashboard capital equals their sum.
+-- 4. Post a customer deposit from M-Pesa to Cash; confirm total expected balance is unchanged.
+-- 5. Close using actual balances. A differing balance must require a reason and yield actual minus expected variance.
+-- 6. Confirm a second user from a different business cannot select these branch/account/day rows.
