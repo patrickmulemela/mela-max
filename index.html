@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="sw">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#39217c" />
+    <title>MELA MAX — Ulinzi wa Mtaji</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="app" class="shell">
+      <section class="card login-card">
+        <div class="brand"><span class="brand-mark">M</span><div><strong>MELA MAX</strong><small>Mfumo wa Wakala na Ulinzi wa Mtaji</small></div></div>
+        <h1>Karibu</h1><p class="muted">Ingia ili kuona na kulinda mtaji wa biashara yako.</p>
+        <form id="login-form" class="stack">
+          <label>Namba ya simu<input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+255712345678" required /></label>
+          <label>Nenosiri<input id="password" type="password" autocomplete="current-password" required /></label>
+          <button class="primary">Ingia</button>
+          <p id="login-error" class="error" role="alert"></p>
+        </form>
+      </section>
+      <section id="workspace" hidden>
+        <header class="topbar"><div class="brand"><span class="brand-mark">M</span><div><strong>MELA MAX</strong><small>Ulinzi wa Mtaji</small></div></div><button id="signout" class="quiet">Toka</button></header>
+        <div id="notice" class="notice" role="status"></div>
+        <section id="setup-card" class="card" hidden><h1>Anzisha biashara</h1><p class="muted">Tengeneza biashara na tawi lako la kwanza.</p><form id="setup-form" class="stack"><label>Jina la biashara<input id="business-name" required minlength="2" /></label><label>Jina la tawi la kwanza<input id="branch-name" required minlength="2" /></label><button class="primary">Anza kutumia</button></form></section>
+        <section id="dashboard" hidden>
+          <div class="welcome"><div><p class="eyebrow">DASHBOARD YA TAWI</p><h1 id="branch-title">—</h1><p id="day-status" class="muted">Hakuna siku iliyo wazi</p></div><select id="branch-select" aria-label="Chagua tawi"></select></div>
+          <div class="capital-card"><div><p>MTaji unaotarajiwa sasa</p><strong id="capital-total">TZS 0</strong><small>Jumla ya cash na salio la accounts</small></div><div class="capital-icon">TZS</div></div>
+          <div id="account-grid" class="account-grid"></div>
+          <div class="actions"><button id="add-account" class="secondary">+ Account</button><button id="open-day" class="secondary">Fungua siku</button><button id="new-tx" class="primary">+ Muamala mpya</button><button id="close-day" class="secondary">Funga siku</button></div>
+          <section class="card"><div class="section-head"><div><h2>Miamala ya leo</h2><p class="muted">Miamala huhifadhiwa baada ya Supabase kuthibitisha.</p></div><button id="refresh" class="quiet">Onyesha upya</button></div><div id="transactions" class="transactions"></div></section>
+        </section>
+      </section>
+    </main>
+    <dialog id="action-dialog"><form id="action-form" class="stack"><div class="section-head"><h2 id="dialog-title">—</h2><button type="button" id="dialog-close" class="quiet">Funga</button></div><div id="dialog-fields"></div><p id="dialog-error" class="error" role="alert"></p><button id="dialog-submit" class="primary">Hifadhi</button></form></dialog>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
