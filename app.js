@@ -23,14 +23,14 @@ async function init() {
 
 $("login-form").addEventListener("submit", async (e) => {
   e.preventDefault(); clear("login-error");
-  const { data, error } = await client.auth.signInWithPassword({ phone: $("phone").value.trim(), password: $("password").value });
-  if (error) return fail("login-error", "Namba au nenosiri si sahihi.");
+  const { data, error } = await client.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+  if (error) return fail("login-error", "Barua pepe au nenosiri si sahihi.");
   user = data.user; showWorkspace(); await loadBusiness();
 });
 $("signout").addEventListener("click", async () => { await client.auth.signOut(); location.reload(); });
 
 async function loadBusiness() {
-  notice("Inapakia taarifa za biashara…");
+  notice("Inapakia taarifa za biasharaâ€¦");
   const { data, error } = await client.from("businesses").select("id,name").order("created_at").limit(1).maybeSingle();
   if (error) return notice("Imeshindikana kupakia biashara: " + error.message, true);
   if (!data) { $("setup-card").hidden = false; $("dashboard").hidden = true; notice(""); return; }
@@ -38,7 +38,7 @@ async function loadBusiness() {
   await loadBranches(); notice("");
 }
 $("setup-form").addEventListener("submit", async (e) => {
-  e.preventDefault(); notice("Inatengeneza biashara…");
+  e.preventDefault(); notice("Inatengeneza biasharaâ€¦");
   const { error } = await client.rpc("create_business", { p_name: $("business-name").value.trim(), p_branch_name: $("branch-name").value.trim() });
   if (error) return notice("Haikuweza kuanzisha biashara: " + error.message, true);
   await loadBusiness();
@@ -65,7 +65,7 @@ async function loadBranch() {
   ]);
   if (a.error || d.error) return notice("Imeshindikana kupakia salio la tawi.", true);
   accounts = a.data || []; activeDay = d.data;
-  $("day-status").textContent = activeDay ? `Siku iko wazi • ${activeDay.business_date}` : "Hakuna siku iliyo wazi";
+  $("day-status").textContent = activeDay ? `Siku iko wazi â€¢ ${activeDay.business_date}` : "Hakuna siku iliyo wazi";
   $("open-day").disabled = !!activeDay; $("new-tx").disabled = !activeDay; $("close-day").disabled = !activeDay; $("add-account").disabled = !!activeDay;
   if (!activeDay) {
     $("capital-total").textContent = money(0);
@@ -80,14 +80,14 @@ async function loadBranch() {
   $("account-grid").innerHTML = accounts.map(a => `<div class="account-card"><span>${escapeHtml(a.name)}</span><strong>${money(byAccount.get(a.id) || 0)}</strong><small>${escapeHtml(a.provider || a.kind)}</small></div>`).join("");
   const { data: txs, error: txError } = await client.from("transactions").select("id,kind,amount_tzs,expected_commission_tzs,created_at,notes").eq("business_day_id", activeDay.id).order("created_at", { ascending: false }).limit(30);
   if (txError) return notice("Imeshindikana kupakia miamala.", true);
-  $("transactions").innerHTML = txs?.length ? txs.map(t => `<article class="tx-row"><div><strong>${escapeHtml(t.kind.replaceAll("_"," "))}</strong><small>${new Date(t.created_at).toLocaleTimeString("sw-TZ",{hour:"2-digit",minute:"2-digit"})}${t.notes ? ` • ${escapeHtml(t.notes)}` : ""}</small></div><strong>${money(t.amount_tzs)}</strong></article>`).join("") : `<p class="muted">Bado hakuna muamala leo.</p>`;
+  $("transactions").innerHTML = txs?.length ? txs.map(t => `<article class="tx-row"><div><strong>${escapeHtml(t.kind.replaceAll("_"," "))}</strong><small>${new Date(t.created_at).toLocaleTimeString("sw-TZ",{hour:"2-digit",minute:"2-digit"})}${t.notes ? ` â€¢ ${escapeHtml(t.notes)}` : ""}</small></div><strong>${money(t.amount_tzs)}</strong></article>`).join("") : `<p class="muted">Bado hakuna muamala leo.</p>`;
 }
 
 function openDialog(title, fields) { $("dialog-title").textContent = title; $("dialog-fields").innerHTML = fields; $("action-form").dataset.idempotencyKey = crypto.randomUUID(); clear("dialog-error"); $("action-dialog").showModal(); }
 $("dialog-close").addEventListener("click", () => $("action-dialog").close());
-$("open-day").addEventListener("click", () => openDialog("Fungua siku", `<p class="muted">Weka salio la sasa la kila account.</p>${accounts.map(a => `<label>${escapeHtml(a.name)} — salio TZS<input data-account="${a.id}" type="number" min="0" step="1" required value="0" /></label>`).join("")}`));
+$("open-day").addEventListener("click", () => openDialog("Fungua siku", `<p class="muted">Weka salio la sasa la kila account.</p>${accounts.map(a => `<label>${escapeHtml(a.name)} â€” salio TZS<input data-account="${a.id}" type="number" min="0" step="1" required value="0" /></label>`).join("")}`));
 $("new-tx").addEventListener("click", () => openDialog("Rekodi muamala", `<label>Aina ya muamala<select id="tx-kind"><option value="customer_deposit">Mteja anaweka pesa</option><option value="customer_withdrawal">Mteja anatoa pesa</option><option value="float_purchase">Kununua float</option><option value="account_transfer">Hamisha kati ya accounts</option><option value="capital_added">Ongeza mtaji</option><option value="owner_withdrawal">Owner amechukua pesa</option><option value="business_expense">Matumizi ya biashara</option><option value="commission_received">Commission imepokelewa</option></select></label><label>Kiasi (TZS)<input id="tx-amount" type="number" min="1" step="1" required /></label><label id="source-wrap">Inatoka account<select id="tx-source">${accounts.map(a=>`<option value="${a.id}">${escapeHtml(a.name)}</option>`).join("")}</select></label><label id="destination-wrap">Inaingia account<select id="tx-destination">${accounts.map(a=>`<option value="${a.id}">${escapeHtml(a.name)}</option>`).join("")}</select></label><label>Commission inayotarajiwa (TZS)<input id="tx-commission" type="number" min="0" step="1" value="0" /></label><label>Maelezo mafupi<input id="tx-notes" maxlength="250" /></label>`));
-$("close-day").addEventListener("click", () => openDialog("Funga siku", `<p class="muted">Thibitisha au rekebisha salio halisi ulilohesabu.</p>${accounts.map(a=>`<label>${escapeHtml(a.name)} — salio halisi<input data-actual="${a.id}" type="number" min="0" step="1" required value="${currentBalances.get(a.id) ?? 0}" /></label>`).join("")}<label>Sababu ya tofauti (ikiwa ipo)<input id="close-reason" maxlength="250" /></label>`));
+$("close-day").addEventListener("click", () => openDialog("Funga siku", `<p class="muted">Thibitisha au rekebisha salio halisi ulilohesabu.</p>${accounts.map(a=>`<label>${escapeHtml(a.name)} â€” salio halisi<input data-actual="${a.id}" type="number" min="0" step="1" required value="${currentBalances.get(a.id) ?? 0}" /></label>`).join("")}<label>Sababu ya tofauti (ikiwa ipo)<input id="close-reason" maxlength="250" /></label>`));
 
 $("action-form").addEventListener("change", (e) => {
   if (e.target.id !== "tx-kind") return;
